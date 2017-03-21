@@ -18,7 +18,7 @@ $(document).ready(function() {
   
 
   /* load the computer */
-  function reset() {
+  function load() {
     $('.wireworld-start').show();
     $('.wireworld-stop').hide();
     
@@ -38,7 +38,21 @@ $(document).ready(function() {
     });
   };
   
-  reset();
+  load();
+  
+  
+  /* reset the computer */
+  function reset() {
+    $('.wireworld-start').show();
+    $('.wireworld-stop').hide();
+    
+    clearInterval(stepTimer);
+    running = false;
+    
+    computer.reset();
+    computer.render(canvas);
+  };
+  
   
   /* step function*/
   function step() {
@@ -83,27 +97,21 @@ $(document).ready(function() {
   
   /* program button clicked */
   $('.wireworld-program').click(function() {
-    if (!computer.isSynchronized()) reset();
+    reset();
     
     var programmer = new WireworldCompiler(computer);
+    var reg = 1;
     
-    programmer.loadRegister(1, 255);
+    var lines = $('.wireworld-memory').val();
+    lines = lines.split(/\r\n|\n/);
+
+    $.each(lines, function(i, line) {
+      var word = parseInt(line);
+      programmer.loadRegister(reg++, word);
+      console.log(word);
+    });
     
     computer.render(canvas);
   });
 
-  
-  
-  /*function getMousePos(e, client) {
-    var rect = client.getBoundingClientRect();
-    return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    };
-  };
-  
-  
-  $('.board').mousedown(function(e) {
-    var pos = computer.getCellPos(canvas, getMousePos(e, canvas));
-  });*/
 });

@@ -4,9 +4,10 @@ var Wireworld = (function() {
     var width = width;
     var height = height;
     var data = new Array2(width, height, 0);
+    var reset_data = data.clone();
     var colors = colors;
     var indexed = false;
-    var pristine = true;
+    var pristine = false;
     
     var heads = [];
     var tails = [];
@@ -78,6 +79,7 @@ var Wireworld = (function() {
       
       indexHeadsAndTails();
       pristine = true;
+      reset_data = data.clone();
     };
     
     
@@ -186,6 +188,13 @@ var Wireworld = (function() {
     //! Is synchronized?
     this.isSynchronized = function() {
       return pristine;
+    };
+    
+    
+    //! Resets the computer.
+    this.reset = function() {
+      data = reset_data.clone();
+      indexHeadsAndTails();
     };
 
   };

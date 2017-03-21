@@ -19,7 +19,7 @@ var WireworldCompiler = (function() {
       [32, 3],
       [26, 3],
       [20, 3],
-      [14, 2]
+      [14, 3]
     ];
     
     var tail_locations = [
