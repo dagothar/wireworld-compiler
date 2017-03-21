@@ -14,7 +14,7 @@ $(document).ready(function() {
     3:    '#0080ff'  // tail
   };
   
-  var computer = new Wireworld(725, 522, colors);
+  var computer = undefined;
   
 
   /* load the computer */
@@ -24,6 +24,8 @@ $(document).ready(function() {
     
     clearInterval(stepTimer);
     running = false;
+    
+    computer = new Wireworld(725, 522, colors);
     
     $.ajax({
       type: "GET",

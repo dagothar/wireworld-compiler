@@ -6,6 +6,9 @@ var Wireworld = (function() {
     var data = new Array2(width, height, 0);
     var colors = colors;
     
+    var heads = [];
+    var tails = [];
+    
     
     //! Defines the neighbourhood.
     this.Neighbourhood = [
@@ -48,7 +51,11 @@ var Wireworld = (function() {
       var idx = 0;
       for (var i = 0; i < height; ++i) {
         for (var j = 0; j < width; ++j) {
-          data.set(j, i, Number(csv[idx++]));
+          var state = Number(csv[idx++]);
+          data.set(j, i, state);
+          
+          if (state == 2) heads.push([j, i]);
+          if (state == 3) tails.push([j, i]);
         }
       }
     };
@@ -72,11 +79,11 @@ var Wireworld = (function() {
      * Loops through all of the pixels...
      */
     this.step = function(canvas) {
-      var mirror = data.clone();
+      //var mirror = data.clone();
       
       var ctx = canvas.getContext('2d');
             
-      for (var i = 0; i < width; ++i) {
+      /*for (var i = 0; i < width; ++i) {
         for (var j = 0; j < height; ++j) {
           
           if (getState(mirror, i, j) == 0) {    // empty -> empty
@@ -88,7 +95,6 @@ var Wireworld = (function() {
             updatePixel(ctx, i, j, 3);
             continue;
           }
-          
           
           if (getState(mirror, i, j) == 3) {  // tail -> wire
             setState(data, i, j, 1);
@@ -104,7 +110,63 @@ var Wireworld = (function() {
           }
           
         }
+      }*/
+      
+      //console.log(heads.length);
+      
+      var nheads = [];
+      var ntails = [];
+      
+      /* process heads */
+      //console.log('heads: ', heads.length);
+      for (var i = 0; i < heads.length; ++i) {
+        
+        var x = heads[i][0]; var y = heads[i][1];
+        
+        // check neighbourhood for empty wires
+        for (var k = 0; k < this.Neighbourhood.length; ++k) {
+          var nx = x + this.Neighbourhood[k][0];
+          var ny = y + this.Neighbourhood[k][1];
+          
+          if(getState(data, nx, ny) == 1) { // wire detected
+            var h = countHeads(data, nx, ny, this.Neighbourhood);
+            //console.log(h);
+            if ((h == 1) || (h == 2)) { // add new head
+              //console.log('adding new head');
+              nheads.push([nx, ny]);
+              setState(data, nx, ny, 3); // to avoid multiplicating
+            }
+          }
+        }
+        
+        // add new tail to replace the head
+        ntails.push([x, y]);
       }
+      
+      /* process tails */
+      for (var i = 0; i < tails.length; ++i) {
+        
+        var x = tails[i][0]; var y = tails[i][1];
+
+        // add new wire to replace the tail
+        setState(data, x, y, 1);
+        updatePixel(ctx, x, y, 1);
+      }
+      
+      /* update data with heads and tails */
+      for (var i = 0; i < nheads.length; ++i) {
+        var x = nheads[i][0]; var y = nheads[i][1];
+        setState(data, x, y, 2);
+        updatePixel(ctx, x, y, 2);
+      }
+      for (var i = 0; i < ntails.length; ++i) {
+        var x = ntails[i][0]; var y = ntails[i][1];
+        setState(data, x, y, 3);
+        updatePixel(ctx, x, y, 3);
+      }
+      
+      heads = nheads;
+      tails = ntails;      
 
     };
     
