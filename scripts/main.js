@@ -2,8 +2,11 @@ $(document).ready(function() {
   
   /* initialize the variables */
   var canvas = $('.board').get(0);
-  var mirror = $('.mirror').get(0);
-  var computer = undefined;
+  
+  var stepTimer = undefined;
+  
+  var running = false;
+  
   var colors = {
     0:    '#000000', // empty
     1:    '#ff8000', // wire
@@ -11,26 +14,73 @@ $(document).ready(function() {
     3:    '#0080ff'  // tail
   };
   
-  /* setup */
-  $('.mirror').hide();
-  $('.wireworld-stop').hide();
+  var computer = new Wireworld(725, 522, colors);
   
+
   /* load the computer */
-  var bitmap = new Image();
-  bitmap.src = 'computer/crop.bmp';
-  bitmap.onload = function() {
-    computer = new Wireworld(bitmap, canvas, mirror, colors);
-    computer.render(canvas);
+  function reset() {
+    $('.wireworld-start').show();
+    $('.wireworld-stop').hide();
+    
+    clearInterval(stepTimer);
+    running = false;
+    
+    $.ajax({
+      type: "GET",
+      url: "data/computer.csv",
+      dataType: "text",
+      success: function(data) {
+        computer.loadFromCSV(data);
+        computer.render(canvas);
+      }
+    });
   };
   
-  /* step */
+  reset();
+  
+  /* step function*/
+  function step() {
+    computer.step(canvas);
+  };
+  
+  
+  /* step button clicked */
   $('.wireworld-step').click(function() {
-    computer.step();
+    step();
+  });
+  
+  
+  /* start button clicked */
+  $('.wireworld-start').click(function() {
+    if (!running) {
+      stepTimer = setInterval(step, 1);
+      running = true;
+      $('.wireworld-start').hide();
+      $('.wireworld-stop').show();
+    }
+  });
+  
+  
+  
+  /* stop button clicked */
+  $('.wireworld-stop').click(function() {
+    if (running) {
+      clearInterval(stepTimer);
+      running = false;
+      $('.wireworld-start').show();
+      $('.wireworld-stop').hide();
+    }
+  });
+  
+  
+  /* reset button clicked */
+  $('.wireworld-reset').click(function() {
+    reset();
   });
 
   
   
-  function getMousePos(e, client) {
+  /*function getMousePos(e, client) {
     var rect = client.getBoundingClientRect();
     return {
       x: e.clientX - rect.left,
@@ -41,5 +91,5 @@ $(document).ready(function() {
   
   $('.board').mousedown(function(e) {
     var pos = computer.getCellPos(canvas, getMousePos(e, canvas));
-  });
+  });*/
 });
