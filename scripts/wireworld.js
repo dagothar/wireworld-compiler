@@ -5,13 +5,15 @@ var Wireworld = (function() {
     var height = height;
     var data = new Array2(width, height, 0);
     var colors = colors;
+    var indexed = false;
+    var pristine = true;
     
     var heads = [];
     var tails = [];
     
     
     //! Defines the neighbourhood.
-    this.Neighbourhood = [
+    var neighbourhood = [
       [ -1, -1 ], [ 0, -1 ], [ 1, -1 ],
       [ -1, 0 ],             [ 1, 0 ],
       [ -1, 1 ],  [ 0, 1 ],  [ 1, 1 ]
@@ -44,6 +46,24 @@ var Wireworld = (function() {
     };
     
     
+    //! Indexes heads and tails.
+    function indexHeadsAndTails() {
+      heads = [];
+      tails = [];
+      
+      for (var i = 0; i < height; ++i) {
+        for (var j = 0; j < width; ++j) {
+          var state = data.get(j, i);
+          
+          if (state == 2) heads.push([j, i]);
+          if (state == 3) tails.push([j, i]);
+        }
+      }
+      
+      indexed = true;
+    };
+    
+    
     //! Loads from CSV.
     this.loadFromCSV = function(csv) {
       csv = csv.split(/, |\r\n|\n/);
@@ -53,16 +73,16 @@ var Wireworld = (function() {
         for (var j = 0; j < width; ++j) {
           var state = Number(csv[idx++]);
           data.set(j, i, state);
-          
-          if (state == 2) heads.push([j, i]);
-          if (state == 3) tails.push([j, i]);
         }
       }
+      
+      indexHeadsAndTails();
+      pristine = true;
     };
     
     
     //! Counts the number of neighbouring electron heads.
-    function countHeads(d, x, y, neighbourhood) {
+    function countHeads(d, x, y) {
       var count = 0;
       
       for (var n = 0; n < neighbourhood.length; ++n) {
@@ -79,40 +99,11 @@ var Wireworld = (function() {
      * Loops through all of the pixels...
      */
     this.step = function(canvas) {
-      //var mirror = data.clone();
+      pristine = false;
+      
+      if (!indexed) indexHeadsAndTails();
       
       var ctx = canvas.getContext('2d');
-            
-      /*for (var i = 0; i < width; ++i) {
-        for (var j = 0; j < height; ++j) {
-          
-          if (getState(mirror, i, j) == 0) {    // empty -> empty
-            continue;
-          }
-          
-          if (getState(mirror, i, j) == 2) {    // head -> tail
-            setState(data, i, j, 3);
-            updatePixel(ctx, i, j, 3);
-            continue;
-          }
-          
-          if (getState(mirror, i, j) == 3) {  // tail -> wire
-            setState(data, i, j, 1);
-            updatePixel(ctx, i, j, 1);
-            continue;
-          }
-          
-          // wire -> head
-          var n = countHeads(mirror, i, j, this.Neighbourhood);
-          if (getState(mirror, i, j, 1) && ((n == 1) || (n == 2))) {
-            setState(data, i, j, 2);
-            updatePixel(ctx, i, j, 2);
-          }
-          
-        }
-      }*/
-      
-      //console.log(heads.length);
       
       var nheads = [];
       var ntails = [];
@@ -124,12 +115,12 @@ var Wireworld = (function() {
         var x = heads[i][0]; var y = heads[i][1];
         
         // check neighbourhood for empty wires
-        for (var k = 0; k < this.Neighbourhood.length; ++k) {
-          var nx = x + this.Neighbourhood[k][0];
-          var ny = y + this.Neighbourhood[k][1];
+        for (var k = 0; k < neighbourhood.length; ++k) {
+          var nx = x + neighbourhood[k][0];
+          var ny = y + neighbourhood[k][1];
           
           if(getState(data, nx, ny) == 1) { // wire detected
-            var h = countHeads(data, nx, ny, this.Neighbourhood);
+            var h = countHeads(data, nx, ny);
             //console.log(h);
             if ((h == 1) || (h == 2)) { // add new head
               //console.log('adding new head');
@@ -182,6 +173,19 @@ var Wireworld = (function() {
           ctx.fillRect(x, y, x+1, y+1);
         }
       }
+    };
+    
+    
+    //! Allows for setting the state from outside.
+    this.putState = function(x, y, state) {
+      setState(data, x, y, state);
+      indexed = false;
+    };
+    
+    
+    //! Is synchronized?
+    this.isSynchronized = function() {
+      return pristine;
     };
 
   };

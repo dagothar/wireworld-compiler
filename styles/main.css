@@ -1,3 +1,7 @@
 .navbar-brand { float: None; }
 
 input { width: 100%; }
+
+textarea {
+   resize: none;
+}

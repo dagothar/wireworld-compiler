@@ -79,6 +79,18 @@ $(document).ready(function() {
   $('.wireworld-reset').click(function() {
     reset();
   });
+  
+  
+  /* program button clicked */
+  $('.wireworld-program').click(function() {
+    if (!computer.isSynchronized()) reset();
+    
+    var programmer = new WireworldCompiler(computer);
+    
+    programmer.loadRegister(1, 255);
+    
+    computer.render(canvas);
+  });
 
   
   
