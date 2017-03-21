@@ -1,0 +1,64 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8"/>
+  <title>Wireworld Computer</title>
+  
+  <!-- styles -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="styles/main.css"/>
+</head>
+
+<body>
+  <div class="header">
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<a class="navbar-brand text-center center-block" href="#">WIREWORLD COMPUTER</a>
+			</div>
+		</nav>
+  </div>
+  
+  <div class="container">
+    <div class="row">
+      
+      <!-- programming -->
+      <div class="col-md-2">
+        
+      </div>
+      
+      <!-- the board -->
+      <div class="col-md-8">
+        <canvas class="board" width="725" height="522"></canvas>
+        <canvas class="mirror" width="725" height="522"></canvas>
+      </div>
+      
+      <!-- controls -->
+      <div class="col-md-2">
+        <div class="panel">
+          <div class="panel-heading">Controls</div>
+          <div class="panel-body">
+            <div class="form-group">
+              <button type="button" class="wireworld-reset btn btn-default btn-block">Reset <span class="glyphicon glyphicon-off"></span></button>
+              <button type="button" class="wireworld-step btn btn-default btn-block">Step <span class="glyphicon glyphicon-step-forward"></span></button>
+              <button type="button" class="wireworld-start btn btn-success btn-block">Start <span class="glyphicon glyphicon-play"></span></button>
+              <button type="button" class="wireworld-stop btn btn-danger btn-block">Stop <span class="glyphicon glyphicon-stop"></span></button>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+  
+  <div class="footer">
+  </div>
+  
+  
+  <!-- scripts -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+  <script src="scripts/wireworld.js"></script>
+  <script src="scripts/main.js"></script>
+</body>
+
+</html>
